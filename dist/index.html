@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>reveal.js</title>
+  <link rel="stylesheet" href="dist/reset.css">
+  <link rel="stylesheet" href="dist/reveal.css">
+  <link rel="stylesheet" href="dist/theme/league.css">
+  <!-- Theme used for syntax highlighted code -->
+  <link rel="stylesheet" href="plugin/highlight/monokai.css">
+</head>
+
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section>
+        <h2>XSS for Cross-site scripting</h2>
+        <p>The Rolling Scopes School 2022Q1S2 slides by <a href="https://github.com/tedgregory">@tedgregory</a></p>
+      </section>
+      <section>
+        <h2>What is XSS?</h2>
+        <section data-auto-animate>
+          <p> Cross-Site Scripting (XSS) attacks are a type of injection, in which malicious scripts are injected into
+            otherwise benign and trusted websites. <a href="https://owasp.com">OWASP</a>
+          </p>
+        </section>
+        <section data-auto-animate>
+          <p> Cross-Site Scripting (XSS) attacks are a type of injection, in which malicious scripts are injected into
+            otherwise benign and trusted websites. <a href="https://owasp.com">OWASP</a>
+          </p>
+        </section>
+        <section data-auto-animate>
+          <p>The end user's browser has no way to know that the script should not be trusted, and will execute the
+            script. </p>
+        </section>
+        <section data-auto-animate>
+          <p>Because it thinks the script came from a trusted source, the malicious script can</p>
+          <ul>
+            <li class="fragment">access any cookies,</li>
+            <li class="fragment">steal session tokens,</li>
+            <li class="fragment">perform different actions on user's behalf</li>
+            <li class="fragment">redirect the user to some other page or site</li>
+            <li class="fragment">modify presentation of content.</li>
+          </ul>
+        </section>
+        <section>
+          <p>An XSS vulnerability allowing an attacker to modify a press release or news item could affect a company's
+            stock price or lessen consumer confidence. <br> An XSS vulnerability on a pharmaceutical site could allow an
+            attacker to modify dosage information resulting in an overdose. And so on.</p>
+        </section>
+      </section>
+      <section>
+        <section>
+          <h2>Types of XSS attacks</h2>
+        </section>
+        <section>
+          <p>Early on, two primary types of XSS were identified, <b>Stored XSS</b> and <b>Reflected XSS</b>. In 2005,
+            Amit Klein defined a third type of XSS,<br> which entitled <b>DOM Based XSS</b>.</p>
+        </section>
+        <section>
+          <h4>1. Reflected XSS (AKA Non-Persistent or Type I)</h4>
+          <p>Reflected XSS occurs when user input is immediately returned by a web application in an error message,
+            search result, or any other response that includes some or all of the input provided by the user as part of
+            the request, without that data being made safe to render in the browser, and without permanently storing the
+            user provided data. </p>
+        </section>
+        <section>
+          <h4>1. Reflected XSS (AKA Non-Persistent or Type I)</h4>
+          <p style="color:greenyellow">For example when an attacker stores malicious script in the data sent from a
+            website's search or contact form. </p>
+          <p>As an example, this code </p>
+          <img src="./test/assets/reflected1.jpg" alt="">
+          <p>executed by a user will show a link with alert. Or
+          <pre><code class="hljs" data-trim>'"><script>alert(context)</script></code></pre>
+          </p>
+        </section>
+        <section>
+          <h4>1. Reflected XSS. More examples</h4>
+          <p>onmouseover</p>
+          <img src="./test/assets/reflected2.jpg" alt="">
+          <p>onerror</p>
+          <img src="./test/assets/reflected3.jpg" alt="">
+        </section>
+        <section>
+          <h4>2. Stored XSS (AKA Persistent or Type II)</h4>
+          <p>Stored XSS generally occurs when user input is stored on the target server, such as in a database, in a
+            message forum, visitor log, comment field, etc. And then a victim retrieves the stored data from the web
+            application without that data being purified. The attack payload can be permanently stored in the victim's
+            browser, such as an HTML5 database, and never being sent to the server at all.</p>
+        </section>
+        <section>
+          <h4>2. Stored XSS (AKA Persistent or Type II)</h4>
+          <p style="color:coral">Examples of stored cross-site scripting attacks include the profile fields such as your
+            username or email, which are saved on the server and displayed on your account page.</p>
+          <p>For example, injecting the following</p> 
+          <p><img src="./test/assets/stored1.jpg" alt="stored"></p> 
+          <p>onto the website with high traffic can cause a DDoS attack</p>
+        </section>
+        <section>
+          <h4>+ Blind Cross-site Scripting</h4>
+          <p>Blind Cross-site Scripting is a form of persistent XSS. It generally occurs when the attacker's payload
+            saved on the server and reflected back to the victim from the backend application. For example in feedback
+            forms, an attacker can submit the malicious payload using the form, and once the backend user/admin opens
+            the attacker's submitted form via the backend application, the payload gets executed.</p>
+        </section>
+        <section>
+          <h4>+ Blind Cross-site Scripting</h4>
+          <p style="color:coral">An example of a blind cross-site scripting attack would be when a username is
+            vulnerable to XSS, but only from an administrative page restricted to admin users. To increase the success
+            rate of these attacks, hackers will often use polyglots, which are designed to work into many different
+            scenarios, such as in an attribute, as plain text, or in a script tag. Here's a polyglot <img
+              src="./test/assets/polyglot1.jpg" alt="polyglot injection">
+          </p>
+        </section>
+        <section data-auto-animate>
+          <h4>3. DOM Based XSS (AKA Type-0)</h4>
+          <p>As defined by Amit Klein, DOM Based XSS is a form of XSS where the entire tainted data flow from source to
+            sink takes place in the browser. For example, the source (where malicious data is read) could be the URL of
+            the page (e.g., document.location.href), or it could be an element of the HTML, and the sink is a sensitive
+            method call that causes the execution of the malicious data (e.g., document.write).”</p>
+        </section>
+        <section data-auto-animate>
+          <h4>3. DOM Based XSS (AKA Type-0)</h4>
+          <p style="color:aquamarine">An example of DOM-based cross-site scripting attack would be when the website
+            changes the language selection from the default one to one provided in the URL. </p>
+        </section>
+      </section>
+      <section>
+        <h3>How to Prevent Cross-Site Scripting Attacks?</h3>
+        <section data-auto-animate>
+          <p>Attackers leverage a variety of methods to exploit website vulnerabilities. As a result, there is no single
+            strategy to mitigate the risk of a cross-site scripting attack.</p>
+        </section>
+        <section data-auto-animate>
+          <p>The concept of cross-site scripting relies on unsafe user input being directly rendered onto a web page. If
+            user inputs are properly sanitized, cross-site scripting attacks would be impossible. There are multiple
+            ways to ensure that user inputs can not be escaped on your websites.</p>
+        </section>
+        <section data-auto-animate>
+          <p>Web application vulnerability automated tools/scanners can assist in finding XSS flaws. However they can't
+            find all XSS vulnerabilities, hence manual code reviews are important. Manual code reviews won't catch all
+            bugs, but it's the best proven strategy.</p>
+        </section>
+        <section data-auto-animate>
+          <p>Code reviewer needs to closely review.</p>
+          <p>1. That untrusted data is not transmitted in the same HTTP responses as HTML or JavaScript.</p>
+        </section>
+        <section data-auto-animate>
+          <p>Code reviewer needs to closely review.</p>
+          <p> 2. When data is transmitted from the server to the client, untrusted data must be properly encoded. Do not
+            assume data from the server is safe. Best practice is to always check data. </p>
+        </section>
+        <section data-auto-animate>
+          <p>Code reviewer needs to closely review.</p>
+          <p> 3. When introduced into the DOM, untrusted data MUST be introduced using one of the following APIs:
+          <ul>
+            <li>Node.textContent</li>
+            <li>document.createTextNode</li>
+            <li>Element.setAttribute (second parameter only)</li>
+          </ul>
+          </p>
+        </section>
+        <section data-auto-animate>
+          <p>Code reviewer needs to closely review.</p>
+          <p> Code reviewer should also be aware of the HTML tags (such as <code>img</code> <code>src</code>,
+            <code>iframe</code>, <code>bgsound</code> etc.) can be used to transmit malicious JavaScript. </p>
+        </section>
+      </section>
+      <section>
+        <section>
+          <p>Each variable in a web application needs to be protected. Make sure that all variables go through
+            validation and are then escaped or sanitized is known as perfect injection resistance. </p>
+        </section>
+        <section>
+          <p>Frameworks make it easy to ensure variables are correctly validated and escaped or sanitised.</p>
+        </section>
+      </section>
+      <section>
+        <h2>Thats it. Thank you.</h2>
+      </section>
+    </div>
+  </div>
+  <script src="dist/reveal.js"></script>
+  <script src="plugin/notes/notes.js"></script>
+  <script src="plugin/markdown/markdown.js"></script>
+  <script src="plugin/highlight/highlight.js"></script>
+  <script>
+    // More info about initialization & config:
+    // - https://revealjs.com/initialization/
+    // - https://revealjs.com/config/
+    Reveal.initialize({
+      hash: true,
+
+      // Learn about plugins: https://revealjs.com/plugins/
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes]
+    });
+  </script>
+</body>
+
+</html>

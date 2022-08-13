@@ -1,0 +1,116 @@
+
+========== OWASP Open Web Application Security Project®
+
+Cross-Site Scripting (XSS) attacks are a type of injection, in which malicious scripts are injected into otherwise benign and trusted websites. XSS attacks occur when an attacker uses a web application to send malicious code, generally in the form of a browser side script, to a different end user. Flaws that allow these attacks to succeed are quite widespread and occur anywhere a web application uses input from a user within the output it generates without validating or encoding it.
+
+An attacker can use XSS to send a malicious script to an unsuspecting user. The end user’s browser has no way to know that the script should not be trusted, and will execute the script. Because it thinks the script came from a trusted source, the malicious script can access any cookies, session tokens, or other sensitive information retained by the browser and used with that site. These scripts can even rewrite the content of the HTML page.
+
+======== Types
+
+Early on, two primary types of XSS were identified, Stored XSS and Reflected XSS. In 2005, Amit Klein defined a third type of XSS, which Amit coined DOM Based XSS. These 3 types of XSS are defined as follows:
+
+Reflected XSS (AKA Non-Persistent or Type I)
+Reflected XSS occurs when user input is immediately returned by a web application in an error message, search result, or any other response that includes some or all of the input provided by the user as part of the request, without that data being made safe to render in the browser, and without permanently storing the user provided data. In some cases, the user provided data may never even leave the browser (see DOM Based XSS below).
+Examples of stored cross-site scripting attacks include the profile fields such as your username or email, which are saved on the server and displayed on your account page
+
+Stored XSS (AKA Persistent or Type II)
+Stored XSS generally occurs when user input is stored on the target server, such as in a database, in a message forum, visitor log, comment field, etc. And then a victim is able to retrieve the stored data from the web application without that data being made safe to render in the browser. With the advent of HTML5, and other browser technologies, we can envision the attack payload being permanently stored in the victim’s browser, such as an HTML5 database, and never being sent to the server at all.
+Examples of reflected cross-site scripting attacks include when an attacker stores malicious script in the data sent from a website’s search or contact form.
+
+DOM Based XSS (AKA Type-0)
+As defined by Amit Klein, DOM Based XSS is a form of XSS where the entire tainted data flow from source to sink takes place in the browser, i.e., the source of the data is in the DOM, the sink is also in the DOM, and the data flow never leaves the browser. For example, the source (where malicious data is read) could be the URL of the page (e.g., document.location.href), or it could be an element of the HTML, and the sink is a sensitive method call that causes the execution of the malicious data (e.g., document.write).”
+An example of DOM-based cross-site scripting attack would be when the website changes the language selection from the default one to one provided in the URL.
+
+===
+Blind Cross-site Scripting
+Blind Cross-site Scripting is a form of persistent XSS. It generally occurs when the attacker’s payload saved on the server and reflected back to the victim from the backend application. For example in feedback forms, an attacker can submit the malicious payload using the form, and once the backend user/admin of the application will open the attacker’s submitted form via the backend application, the attacker’s payload will get executed.
+
+=== ====== examples
+https://owasp.org/www-community/attacks/xss/
+
+https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html
+
+<script> window.setInterval(‘...EVEN IF YOU ESCAPE UNTRUSTED DATA YOU ARE XSSED HERE...’); </script> 
+
+eval
+var txtField = “A1”; var txtUserInput = “’test@google.ie’;alert(1);”; eval( “document.forms[0].” + txtField +
+“.value =” + A1); 
+
+test
+( “test<script>alert(1)<\/script>”);<-- treat user input as text 
+
+===
+The most severe XSS attacks involve disclosure of the user’s session cookie, allowing an attacker to hijack the user’s session and take over the account. Other damaging attacks include the disclosure of end user files, installation of Trojan horse programs, redirect the user to some other page or site, or modify presentation of content. An XSS vulnerability allowing an attacker to modify a press release or news item could affect a company’s stock price or lessen consumer confidence. An XSS vulnerability on a pharmaceutical site could allow an attacker to modify dosage information resulting in an overdose. 
+=====
+
+Blind cross-site scripting attacks occur when an attacker can’t see the result of an attack. In these attacks, the vulnerability commonly lies on a page where only authorized users can access.
+
+To increase the success rate of these attacks, hackers will often use polyglots, which are designed to work into many different scenarios, such as in an attribute, as plain text, or in a script tag.
+
+An example of a blind cross-site scripting attack would be when a username is vulnerable to XSS, but only from an administrative page restricted to admin users.
+
+
+======= Mitigation
+Nessus, Nikto, and some other available tools can help scan a website for these flaws, but can only scratch the surface. If one part of a website is vulnerable, there is a high likelihood that there are other problems as well.
+========== owasp
+
+=== Recommended Server XSS Defenses
+Server XSS is caused by including untrusted data in an HTML response. The easiest and strongest defense against Server XSS in most cases is:
+
+-Context-sensitive server side output encoding
+The details on how to implement Context-sensitive server side output encoding are presented in the OWASP XSS (Cross Site Scripting) Prevention Cheat Sheet in great detail.
+
+Input validation or data sanitization can also be performed to help prevent Server XSS, but it’s much more difficult to get correct than context-sensitive output encoding.
+
+Recommended Client XSS Defenses
+Client XSS is caused when untrusted data is used to update the DOM with an unsafe JavaScript call. The easiest and strongest defense against Client XSS is:
+
+- Using safe JavaScript APIs
+However, developers frequently don’t know which JavaScript APIs are safe or not, never mind which methods in their favorite JavaScript library are safe. Some information on which JavaScript and jQuery methods are safe and unsafe is presented in Dave Wichers’ DOM Based XSS talk presented at OWASP AppSec USA in 2012 XSS [2]
+
+If you know that a JavaScript method is unsafe, our primary recommendation is to find an alternative safe method to use. If you can’t for some reason, then context sensitive output encoding can be done in the browser, before passing that data to the unsafe JavaScript method. OWASP’s guidance on how do this properly is presented in the DOM based XSS Prevention Cheat Sheet. Note that this guidance is applicable to all types of Client XSS, regardless of where the data actually comes from (DOM or Server).
+==============
+How to Prevent Cross-Site Scripting Attacks?
+Attackers leverage a variety of methods to exploit website vulnerabilities. As a result, there is no single strategy to mitigate the risk of a cross-site scripting attack.
+
+The concept of cross-site scripting relies on unsafe user input being directly rendered onto a web page. If user inputs are properly sanitized, cross-site scripting attacks would be impossible. There are multiple ways to ensure that user inputs can not be escaped on your websites.
+
+========== protection (owasp cheatsheet)
+Code reviewer needs to closely review.
+1. That untrusted data is not transmitted in the same HTTP responses as HTML or JavaScript.
+2. When data is transmitted from the server to the client, untrusted data must be properly encoded and the HTTP
+response. Do not assume data from the server is safe. Best practice is to always check data.
+3. When introduced into the DOM, untrusted data MUST be introduced using one of the following APIs:
+a. Node.textContent
+b. document.createTextNode
+c. Element.setAttribute (second parameter only)
+Code reviewer should also be aware of the HTML tags (such as <img src…>, <iframe…>, <bgsound src…> etc.) can
+be used to transmit malicious JavaScript.
+Web application vulnerability automated tools/scanners can help to fnd Cross-Site scripting faws. However they
+cannot fnd all XSS vulnerabilities, hence manual code reviews are important. Manual code reviews wont catch
+all either but a defense in depth approach is always the best approach based on your level of risk.
+
+++++
+HTML Attribute Encoding
+HTML attributes may contain untrusted data. It is important to determine if any ot the HTML attributes on a
+given page contains data from outside the trust boundary.
+Some HTML attributes are considered safer than others such as align, alink, alt, bgcolor, border, cellpadding,
+cellspacing, class, color, cols, colspan, coords, dir, face, height, hspace, ismap, lang, marginheight, marginwidth,
+multiple, nohref, noresize, noshade, nowrap, ref, rel, rev, rows, rowspan, scrolling, shape, span, summary, tabindex, title, usemap, valign, value, vlink, vspace, width.
+When reviewing code for XSS we need to look for HTML attributes such as the following reviewing code for
+XSS we need to look for HTML attributes such as the following:
+<input type=”text” name=”fname” value=”UNTRUSTED DATA”>
+Attacks may take the following format:
+“><script>/* bad stuf */</script>
+What is Attribute encoding?
+HTML attribute encoding replaces a subset of characters that are important to prevent a string of characters
+from breaking the attribute of an HTML element.
+
+-==========
+
+
+Bug Hunter University https://bughunters.google.com/
+
+Google XSS game https://xss-game.appspot.com/
+
+https://xss.pwnfunction.com/
