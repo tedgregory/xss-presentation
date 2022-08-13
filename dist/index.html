@@ -118,13 +118,6 @@
             saved on the server and reflected back to the victim from the backend application. 
           </p>
         </section>
-        <section>
-          <h4>+ Blind Cross-site Scripting</h4>
-          <p>
-            For example in feedback forms, an attacker can submit the malicious payload using the form, and once the backend user/admin opens
-            the attacker's submitted form via the backend application, the payload gets executed.          </p>
-        </section>
-        <section>
           <h4>+ Blind Cross-site Scripting</h4>
           <p style="color:coral">To increase the success
             rate of these attacks, hackers will often use polyglots, which are designed to work into many different
@@ -140,7 +133,8 @@
             sink takes place in the browser.
           </blockquote> For example, the source (where malicious data is read) could be the URL of
             the page (e.g., document.location.href), or it could be an element of the HTML, and the sink is a sensitive
-            method call that causes the execution of the malicious data (e.g., document.write).</p>
+            method call that causes the execution of the malicious data (e.g., document.write).
+          </p>
         </section>
         <section data-auto-animate>
           <h4>3. DOM Based XSS (AKA Type-0)</h4>
